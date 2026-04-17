@@ -29,12 +29,10 @@
   let ledSerialPort = "COM5";
 
   let dirty = false;
-
   function markDirty() {
     dirty = true;
   }
 
-  // let debugstr = "";
   let versionString = "";
   let ips: Array<string> = [];
   let polling = null;
@@ -53,14 +51,11 @@
         await emit("queryState", "");
       }, 50);
     }
-    // console.log(enabled, polling, tick);
   }
 
-  // Receive events
   onMount(async () => {
     document.addEventListener("contextmenu", (event) => event.preventDefault());
 
-    // console.log(emit, listen);
     await listen("showConfig", (event) => {
       const payload: any = JSON.parse(event.payload as any);
       deviceMode = payload.deviceMode || "none";
@@ -86,20 +81,17 @@
       ledUmgrWebsocketPort = payload.ledUmgrWebsocketPort || 7124;
       ledSerialPort = payload.ledSerialPort || "COM5";
     });
-
     await listen("showState", (event) => {
       previewData = event.payload as any;
     });
     await listen("showTimerState", (event) => {
       timerData = event.payload as string;
     });
-
     await listen("listIps", (event) => {
       ips = (event.payload as Array<string>).filter(
         (x) => x.split(".").length == 4
       );
     });
-
     await emit("ready", "");
 
     updatePolling(true);
@@ -111,11 +103,8 @@
       console.log("ackHide");
       updatePolling(false);
     });
-
     versionString = ` ${await getVersion()}`;
   });
-
-  // Emit events
 
   async function setConfig() {
     console.log("Updating config");
@@ -199,6 +188,8 @@
           <option value="yuancon-three">Yuancon Laverita v3, HID Firmware</option>
           <option value="yubideck">大四 / Yubideck, HID Firmware 1.0</option>
           <option value="yubideck-three">大四 / Yubideck, HID Firmware 3.0</option>
+          <option value="linnea-legacy">Linnea</option>
+          <option value="linnea-c">Linnea C</option>
           <option value="diva">Slider over Serial</option>
           <option value="brokenithm">Brokenithm</option>
           <option value="brokenithm-led">Brokenithm + Led</option>
@@ -206,7 +197,10 @@
         </select>
       </div>
     </div>
-    {#if deviceMode.slice(0, 8) === "tasoller" || deviceMode.slice(0, 7) === "yuancon" || deviceMode.slice(0, 8) === "yubideck" || (deviceMode.slice(0, 10) === "brokenithm" && deviceMode !== "brokenithm-nostalgia")}
+    {#if deviceMode.slice(0, 8) === "tasoller" ||
+      deviceMode.slice(0, 7) === "yuancon" || deviceMode.slice(0, 8) === "yubideck" ||
+      deviceMode.slice(0, 6) === "linnea" ||
+      (deviceMode.slice(0, 10) === "brokenithm" && deviceMode !== "brokenithm-nostalgia")}
       <div class="row">
         <div class="label" />
         <div class="input">
@@ -324,8 +318,7 @@
           <option value="gamepad-hori-wide"
             >DS4, HORI DIVA FT ASC Slider Only Layout</option
           >
-          <!-- <option value="websocket">Websocket</option> -->
-        </select>
+          </select>
       </div>
     </div>
     {#if deviceMode === "brokenithm-nostalgia" && outputMode !== "none" && outputMode.slice(0, 5) !== "kb-32"}
@@ -453,7 +446,6 @@
             >Reactive, DIVA Future Tone Layout</option
           >
           <option value="attract">Rainbow Attract Mode</option>
-          <!-- <option value="websocket">Websocket</option> -->
           <option value="umgr-websocket">UMIGURI Websocket</option>
           <option value="serial">Serial</option>
         </select>

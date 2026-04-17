@@ -8,6 +8,7 @@ pub enum HardwareSpec {
   YuanconThree,
   Yubideck,
   YubideckThree,
+  LinneaLegacy, // [新增] Linnea 旧版设备
 }
 
 #[derive(Debug, Clone)]
@@ -61,6 +62,11 @@ impl DeviceMode {
       },
       "yubideck-three" => DeviceMode::Hardware {
         spec: HardwareSpec::YubideckThree,
+        disable_air: v["disableAirStrings"].as_bool()?,
+      },
+      // [新增] 映射前端界面的 Linnea Legacy
+      "linnea-legacy" => DeviceMode::Hardware {
+        spec: HardwareSpec::LinneaLegacy,
         disable_air: v["disableAirStrings"].as_bool()?,
       },
       "diva" => DeviceMode::DivaSlider {
